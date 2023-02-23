@@ -26,7 +26,7 @@ export default function Home() {
           </p>
           <div>
             <a
-              href="https://github.com/BostonLeeK/nextjs-react-quill-typescript"
+              href="https://github.com/BostonLeeK/react-quill-nextjs-example"
               target="_blank"
               rel="noopener noreferrer"
             >
