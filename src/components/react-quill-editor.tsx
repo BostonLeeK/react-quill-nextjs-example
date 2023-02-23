@@ -1,8 +1,8 @@
 import "react-quill/dist/quill.snow.css";
 
-import QuillComponent, { ReactQuillProps } from 'react-quill';
-import { useEffect, useRef } from "react";
 import { BindingHandlerContext, BindingHandlerRange } from "@/types/react-quill";
+import { useEffect, useRef } from "react";
+import QuillComponent, { ReactQuillProps } from 'react-quill';
 
 
 const ReactQuill = (
@@ -49,11 +49,7 @@ export const ReactQuillEditor = () => {
                 key: 'h',
                 shortKey: true,
                 handler: function (range: BindingHandlerRange, context: BindingHandlerContext) {
-                    if (context.format.header === 3) {
-                        this.quill.format('header', false);
-                    } else {
-                        this.quill.format('header', 3);
-                    }
+                    this.quill.format('header', context.format.header === 3 ? false : 3);
                 }
             });
         }

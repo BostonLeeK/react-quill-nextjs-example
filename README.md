@@ -1,38 +1,56 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Using React-Quill with Next.js my suggestion ##
 
-## Getting Started
+If you are facing a problem when using react-quill with Next.js and need to render ssr false, you can find such answer from internet:
 
-First, run the development server:
+```javascript
+import dynamic from 'next/dynamic';
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+function App() {
+    const [value, setValue] = useState('')
+    return(
+       <ReactQuill value={value} onChange={setValue}/>
+    )
+} 
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+but it's works ONLY for such simple example. When you will need make some more complicated you will face with a lot of problems. 
+For example if you need to bind custom keyboard events. 
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+My suggestion is down
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+To do this, you can define a custom ReactQuill component that conditionally requires the react-quill module based on whether the window object is available:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```javascript
+import { BindingHandlerContext, BindingHandlerRange } from "@/types/react-quill";
+import QuillComponent, { ReactQuillProps } from 'react-quill';
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+const ReactQuill = (
+    typeof window === 'object' ? require('react-quill') : () => false
+) as React.FC<ReactQuillProps & { ref: React.Ref<QuillComponent> }>;
+```
 
-## Learn More
+Here, we're importing the necessary types from the @/types/react-quill module, as well as the QuillComponent and ReactQuillProps from the react-quill module. We're then defining a ReactQuill component that uses require to import react-quill if window is available, and returns a function that always returns false if it's not. We also pass in the ReactQuillProps and a reference to the QuillComponent as props to the ReactQuill component.
 
-To learn more about Next.js, take a look at the following resources:
+You can then use the ReactQuill component in your code like this:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```javascript
+import { useState, useRef } from 'react';
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+function MyComponent() {
+    const [value, setValue] = useState('');
+    const quillRef = useRef(null);
 
-## Deploy on Vercel
+    const handleChange = (newValue) => {
+        setValue(newValue);
+    };
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+    return (
+        <ReactQuill
+            value={value}
+            onChange={handleChange}
+            ref={quillRef}
+        />
+    );
+}
+```
